@@ -18,6 +18,7 @@ public class Login extends AppCompatActivity {
 
     boolean signUpMode = true;
 
+
     public void loginSwitch (View view){
 
         Button signUpButton = (Button)findViewById(R.id.signUpButton);
