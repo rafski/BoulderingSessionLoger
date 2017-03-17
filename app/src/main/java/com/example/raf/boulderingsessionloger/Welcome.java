@@ -2,9 +2,13 @@ package com.example.raf.boulderingsessionloger;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.parse.ParseUser;
@@ -16,10 +20,45 @@ public class Welcome extends AppCompatActivity {
 
     private List<Session> sessions;
     private RecyclerView recyclerView;
+    View parentLayout;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()){
+
+            case R.id.logoutmenubutton:
+                ParseUser.logOut();
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                goToLogIn();
+                return true;
+            default:
+                return false;
+
+        }
+
+    }
 
     public void goToLogSession(View view) {
 
         Intent intent = new Intent(Welcome.this, Log_session.class);
+        startActivity(intent);
+
+    }
+
+    public void goToLogIn() {
+
+        Intent intent = new Intent(Welcome.this, Login.class);
         startActivity(intent);
 
     }
@@ -38,6 +77,8 @@ public class Welcome extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.my_recycler);
 
+        parentLayout = findViewById(R.id.coordinatorLayout);
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
         recyclerView.setHasFixedSize(true);
@@ -55,7 +96,18 @@ public class Welcome extends AppCompatActivity {
             Intent intent = new Intent(Welcome.this, Login.class);
             startActivity(intent);
         }
+
+        FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addSessionFAB);
+        FAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                goToLogSession(view);
+            }
+        });
     }
+
+
 
 
     private void initializeData() {
