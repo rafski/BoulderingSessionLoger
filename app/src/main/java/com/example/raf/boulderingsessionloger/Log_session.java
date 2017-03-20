@@ -1,9 +1,12 @@
 package com.example.raf.boulderingsessionloger;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +15,7 @@ public class Log_session extends AppCompatActivity {
 
     private List<Problem> problems;
     private RecyclerView recyclerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +33,17 @@ public class Log_session extends AppCompatActivity {
 
         initializeData();
         initializeAdapter();
+
+        FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addProblemFAB);
+        FAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(Log_session.this, AddProblem.class);
+                startActivity(intent);
+
+            }
+        });
     }
 
 
