@@ -2,30 +2,52 @@ package com.example.raf.boulderingsessionloger;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Log_session extends AppCompatActivity {
 
-    public void buttonPressed(View view) {
-
-        int id = view.getId();
-        String ourId = "";
-
-        ourId = view.getResources().getResourceEntryName(id);
-
-        //int resourceId = getResources().getIdentifier(ourId, null, null);
-
-       //do stuff with specific button here
-
-        Log.i("button tapped", ourId);
-
-    }
-
+    private List<Problem> problems;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_session);
+
+        recyclerView = (RecyclerView) findViewById(R.id.problemRecyclerView);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setHasFixedSize(true);
+
+        ProblemRecyclerViewAdapter adapter = new ProblemRecyclerViewAdapter(problems);
+        recyclerView.setAdapter(adapter);
+
+        initializeData();
+        initializeAdapter();
     }
+
+
+    private void initializeData() {
+        problems = new ArrayList<>();
+        problems.add(new Problem(1 ,2 , 3, true, false, "Blue"));
+        problems.add(new Problem(1 ,5 , 3, true, false, "Red"));
+        problems.add(new Problem(1 ,6 , 3, true, true, "Circuit Board Red"));
+        problems.add(new Problem(1 ,7 , 3, true, false, "Green"));
+        problems.add(new Problem(1 ,2 , 8, false, false, "Blue"));
+        problems.add(new Problem(1 ,2 , 1, true, false, "Hendrix"));
+        problems.add(new Problem(1 ,2 , 2, true, false, "Blue"));
+        problems.add(new Problem(5 ,2 , 3, true, false, "Comp Wall"));
+
+    }
+
+    private void initializeAdapter() {
+        ProblemRecyclerViewAdapter adapter = new ProblemRecyclerViewAdapter(problems);
+        recyclerView.setAdapter(adapter);
+    }
+
 }

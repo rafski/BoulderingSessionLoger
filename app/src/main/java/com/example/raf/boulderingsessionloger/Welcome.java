@@ -79,17 +79,18 @@ public class Welcome extends AppCompatActivity {
 
         parentLayout = findViewById(R.id.coordinatorLayout);
 
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(llm);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
 
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(sessions);
+        SessionRecyclerViewAdapter adapter = new SessionRecyclerViewAdapter(sessions);
         recyclerView.setAdapter(adapter);
 
         initializeData();
         initializeAdapter();
 
         ParseUser currentUser = ParseUser.getCurrentUser();
+
         if (currentUser != null) {
             // do stuff with the user
         } else {
@@ -107,9 +108,6 @@ public class Welcome extends AppCompatActivity {
         });
     }
 
-
-
-
     private void initializeData() {
         sessions = new ArrayList<>();
         sessions.add(new Session("12 sends", "V4 average"));
@@ -124,7 +122,7 @@ public class Welcome extends AppCompatActivity {
     }
 
     private void initializeAdapter() {
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(sessions);
+        SessionRecyclerViewAdapter adapter = new SessionRecyclerViewAdapter(sessions);
         recyclerView.setAdapter(adapter);
     }
 }
