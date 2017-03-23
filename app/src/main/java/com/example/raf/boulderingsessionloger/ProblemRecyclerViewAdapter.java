@@ -11,7 +11,7 @@ import java.util.List;
  * Created by raf on 20/03/2017.
  */
 
-public class ProblemRecyclerViewAdapter extends RecyclerView.Adapter<ProblemViewHolder>{
+public class ProblemRecyclerViewAdapter extends RecyclerView.Adapter<ProblemListViewHolder>{
 
     List<Problem> problems;
 
@@ -26,14 +26,14 @@ public class ProblemRecyclerViewAdapter extends RecyclerView.Adapter<ProblemView
     }
 
     @Override
-    public ProblemViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.problem_item, viewGroup, false);
-        ProblemViewHolder problemViewHolder = new ProblemViewHolder(v);
-        return problemViewHolder;
+    public ProblemListViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.problem_list_item, viewGroup, false);
+        ProblemListViewHolder problemListViewHolder = new ProblemListViewHolder(v);
+        return problemListViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(ProblemViewHolder holder, int i) {
+    public void onBindViewHolder(ProblemListViewHolder holder, int i) {
         holder.problemGrade.setText(Integer.toString(problems.get(i).grade));
         holder.problemAttemptsNumber.setText(Integer.toString(problems.get(i).attemptsNumber));
         holder.problemIsTraining.setText(String.valueOf(problems.get(i).isTraining));
