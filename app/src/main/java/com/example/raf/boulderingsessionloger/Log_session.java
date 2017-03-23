@@ -8,13 +8,38 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class Log_session extends AppCompatActivity {
 
-    private List<Problem> problems;
-    private RecyclerView recyclerView;
+    Date today;
+    Date tomorrow;
+
+
+    public void getDate() {
+
+        Calendar cal = new GregorianCalendar();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        today = cal.getTime();
+
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+
+        tomorrow = cal.getTime();
+
+    }
 
 
     @Override
@@ -22,17 +47,42 @@ public class Log_session extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_session);
 
-        recyclerView = (RecyclerView) findViewById(R.id.problemRecyclerView);
+        final List<Problem> problems = new ArrayList<>();
+
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.problemRecyclerView);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
 
-        ProblemRecyclerViewAdapter adapter = new ProblemRecyclerViewAdapter(problems);
-        recyclerView.setAdapter(adapter);
+        final ProblemRecyclerViewAdapter adapter = new ProblemRecyclerViewAdapter(problems);
 
-        initializeData();
-        initializeAdapter();
+
+        getDate();
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
+
+        query.whereGreaterThanOrEqualTo("createdAt", today);
+        query.whereLessThan("createdAt", tomorrow);
+
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+
+                if (e == null){
+
+                    if (objects.size() > 0){
+
+                        for (ParseObject object : objects){
+
+                            problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") , object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                        }
+
+                        recyclerView.setAdapter(adapter);
+                    }
+                }
+            }
+        });
 
         FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addProblemFAB);
         FAB.setOnClickListener(new View.OnClickListener() {
@@ -44,25 +94,7 @@ public class Log_session extends AppCompatActivity {
 
             }
         });
-    }
 
-
-    private void initializeData() {
-        problems = new ArrayList<>();
-        problems.add(new Problem(1 ,2 , 3, true, false, "Blue"));
-        problems.add(new Problem(1 ,5 , 3, true, false, "Red"));
-        problems.add(new Problem(1 ,6 , 3, true, true, "Circuit Board Red"));
-        problems.add(new Problem(1 ,7 , 3, true, false, "Green"));
-        problems.add(new Problem(1 ,2 , 8, false, false, "Blue"));
-        problems.add(new Problem(1 ,2 , 1, true, false, "Hendrix"));
-        problems.add(new Problem(1 ,2 , 2, true, false, "Blue"));
-        problems.add(new Problem(5 ,2 , 3, true, false, "Comp Wall"));
-
-    }
-
-    private void initializeAdapter() {
-        ProblemRecyclerViewAdapter adapter = new ProblemRecyclerViewAdapter(problems);
-        recyclerView.setAdapter(adapter);
     }
 
 }

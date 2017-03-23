@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -71,37 +72,44 @@ public class AddProblem extends AppCompatActivity {
             @Override
             public void onClick(final View view) {
 
-                ParseObject SavedProblem = new ParseObject("SavedProblem");
-                SavedProblem.put("circuitName", problemCircuitName.getText().toString());
-                SavedProblem.put("problemNumber", Integer.parseInt(problemNumber.getText().toString()));
-                SavedProblem.put("problemGrade", Integer.parseInt(problemGrade.getText().toString()));
-                SavedProblem.put("problemAttempts", Integer.parseInt(problemAttempts.getText().toString()));
-                SavedProblem.put("problemIsCompleted", isCompleted);
-                SavedProblem.put("problemItTraining", isTraining);
-                SavedProblem.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException ex) {
-                        if (ex == null) {
-                            Snackbar snackbar = Snackbar
-                                    .make(view, "Problem Saved", Snackbar.LENGTH_LONG);
-                            snackbar.setAction("CLOSE", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
+                if (!problemCircuitName.getText().toString().equals("")  && !problemNumber.getText().toString().equals("")
+                        && !problemGrade.getText().toString().equals("")  && !problemAttempts.getText().toString().equals("")) {
 
-                                }
-                            }).show();
-                        } else {
-                            Snackbar snackbar = Snackbar
-                                    .make(view, "Saving problem failed", Snackbar.LENGTH_LONG);
-                            snackbar.setAction("CLOSE", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
+                    ParseObject SavedProblem = new ParseObject("SavedProblem");
+                    SavedProblem.put("circuitName", problemCircuitName.getText().toString());
+                    SavedProblem.put("problemNumber", Integer.parseInt(problemNumber.getText().toString()));
+                    SavedProblem.put("problemGrade", Integer.parseInt(problemGrade.getText().toString()));
+                    SavedProblem.put("problemAttempts", Integer.parseInt(problemAttempts.getText().toString()));
+                    SavedProblem.put("problemIsCompleted", isCompleted);
+                    SavedProblem.put("problemItTraining", isTraining);
+                    SavedProblem.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException ex) {
+                            if (ex == null) {
+                                Snackbar snackbar = Snackbar
+                                        .make(view, "Problem Saved", Snackbar.LENGTH_LONG);
+                                snackbar.setAction("CLOSE", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
 
-                                }
-                            }).show();
+                                    }
+                                }).show();
+                            } else {
+                                Snackbar snackbar = Snackbar
+                                        .make(view, "Saving problem failed", Snackbar.LENGTH_LONG);
+                                snackbar.setAction("CLOSE", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+
+                                    }
+                                }).show();
+                            }
                         }
-                    }
-                });
+                    });
+                }else{
+
+                    Toast.makeText(getApplication().getBaseContext(), "Please fill in all the fields", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
