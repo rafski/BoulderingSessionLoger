@@ -9,13 +9,13 @@ import android.widget.TextView;
  * Created by raf on 20/03/2017.
  */
 
-public class SessionViewHolder extends RecyclerView.ViewHolder {
+public class SessionListViewHolder extends RecyclerView.ViewHolder {
 
     CardView sessionCard;
     TextView sendNumber;
     TextView sendAverage;
 
-    SessionViewHolder(View itemView) {
+    SessionListViewHolder(View itemView) {
         super(itemView);
         sessionCard = (CardView)itemView.findViewById(R.id.sessionCard);
         sendNumber = (TextView)itemView.findViewById(R.id.numberOfSendsTextView);

@@ -11,7 +11,7 @@ import java.util.List;
  * Created by raf on 17/03/2017.
  */
 
-public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionViewHolder>{
+public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionListViewHolder>{
 
 
 
@@ -28,14 +28,14 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionView
     }
 
     @Override
-    public SessionViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.session_item, viewGroup, false);
-        SessionViewHolder sessionViewHolder = new SessionViewHolder(v);
-        return sessionViewHolder;
+    public SessionListViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.session_list_item, viewGroup, false);
+        SessionListViewHolder sessionListViewHolder = new SessionListViewHolder(v);
+        return sessionListViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(SessionViewHolder holder, int i) {
+    public void onBindViewHolder(SessionListViewHolder holder, int i) {
         holder.sendNumber.setText(sessions.get(i).numberOfSends);
         holder.sendAverage.setText(sessions.get(i).averageSendDifficulty);
     }
