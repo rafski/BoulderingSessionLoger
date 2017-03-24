@@ -84,7 +84,7 @@ public class Login extends AppCompatActivity implements View.OnKeyListener, View
                 parseUser.signUpInBackground(new SignUpCallback() {
                     public void done(ParseException e) {
                         if (e == null) {
-                            Log.i("Login", "OK");
+                            Log.i("Login", "Successfull");
                             Intent intent = new Intent(Login.this, Welcome.class);
                             startActivity(intent);
                         } else {
