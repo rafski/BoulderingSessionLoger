@@ -10,8 +10,10 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 public class AddProblem extends AppCompatActivity {
@@ -30,6 +32,8 @@ public class AddProblem extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_problem);
+
+
 
         problemGrade = (EditText) findViewById(R.id.problemAddGradeEditText);
         problemAttempts = (EditText) findViewById(R.id.problemAddAttemptsEditText);
@@ -75,37 +79,60 @@ public class AddProblem extends AppCompatActivity {
                 if (!problemCircuitName.getText().toString().equals("")  && !problemNumber.getText().toString().equals("")
                         && !problemGrade.getText().toString().equals("")  && !problemAttempts.getText().toString().equals("")) {
 
-                    ParseObject SavedProblem = new ParseObject("SavedProblem");
-                    SavedProblem.put("circuitName", problemCircuitName.getText().toString());
-                    SavedProblem.put("problemNumber", Integer.parseInt(problemNumber.getText().toString()));
-                    SavedProblem.put("problemGrade", Integer.parseInt(problemGrade.getText().toString()));
-                    SavedProblem.put("problemAttempts", Integer.parseInt(problemAttempts.getText().toString()));
-                    SavedProblem.put("problemIsCompleted", isCompleted);
-                    SavedProblem.put("problemItTraining", isTraining);
-                    SavedProblem.saveInBackground(new SaveCallback() {
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("BoulderingSession");
+
+                    query.orderByDescending("createdAt");
+                    query.getFirstInBackground(new GetCallback<ParseObject>() {
                         @Override
-                        public void done(ParseException ex) {
-                            if (ex == null) {
-                                Snackbar snackbar = Snackbar
-                                        .make(view, "Problem Saved", Snackbar.LENGTH_LONG);
-                                snackbar.setAction("CLOSE", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
+                        public void done(ParseObject object, ParseException e) {
+                            if (e == null) {
+                                if (object != null){
 
-                                    }
-                                }).show();
+                                    ParseObject SavedProblem = new ParseObject("SavedProblem");
+                                    SavedProblem.put("circuitName", problemCircuitName.getText().toString());
+                                    SavedProblem.put("problemNumber", Integer.parseInt(problemNumber.getText().toString()));
+                                    SavedProblem.put("problemGrade", Integer.parseInt(problemGrade.getText().toString()));
+                                    SavedProblem.put("problemAttempts", Integer.parseInt(problemAttempts.getText().toString()));
+                                    SavedProblem.put("problemIsCompleted", isCompleted);
+                                    SavedProblem.put("problemItTraining", isTraining);
+                                    SavedProblem.put("parent", object);
+                                    SavedProblem.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException ex) {
+                                            if (ex == null) {
+                                                Snackbar snackbar = Snackbar
+                                                        .make(view, "Problem Saved", Snackbar.LENGTH_LONG);
+                                                snackbar.setAction("CLOSE", new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+
+                                                    }
+                                                }).show();
+                                            } else {
+                                                Snackbar snackbar = Snackbar
+                                                        .make(view, "Saving problem failed", Snackbar.LENGTH_LONG);
+                                                snackbar.setAction("CLOSE", new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+
+                                                    }
+                                                }).show();
+                                                ex.printStackTrace();
+                                            }
+                                        }
+                                    });
+
+
+                                }
+
                             } else {
-                                Snackbar snackbar = Snackbar
-                                        .make(view, "Saving problem failed", Snackbar.LENGTH_LONG);
-                                snackbar.setAction("CLOSE", new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-
-                                    }
-                                }).show();
+                                Toast.makeText(getApplication().getBaseContext(), "Oops", Toast.LENGTH_LONG).show();
                             }
                         }
                     });
+
+
+
                 }else{
 
                     Toast.makeText(getApplication().getBaseContext(), "Please fill in all the fields", Toast.LENGTH_LONG).show();

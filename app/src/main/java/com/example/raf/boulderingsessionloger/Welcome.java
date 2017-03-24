@@ -51,16 +51,17 @@ public class Welcome extends AppCompatActivity {
 
     public void goToLogSession(View view) {
 
-        Intent intent = new Intent(Welcome.this, Log_session.class);
-        startActivity(intent);
+        boolean isNew = true;
 
+        Intent intent = new Intent(Welcome.this, Log_session.class);
+        intent.putExtra("isNew", isNew );
+        startActivity(intent);
     }
 
     public void goToLogIn() {
 
         Intent intent = new Intent(Welcome.this, Login.class);
         startActivity(intent);
-
     }
 
     public void goToViewHistory(View view) {
@@ -96,6 +97,7 @@ public class Welcome extends AppCompatActivity {
         } else {
             Intent intent = new Intent(Welcome.this, Login.class);
             startActivity(intent);
+
         }
 
         FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addSessionFAB);
