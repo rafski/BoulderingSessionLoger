@@ -57,13 +57,13 @@ public class Log_session extends AppCompatActivity {
 
         final ProblemRecyclerViewAdapter adapter = new ProblemRecyclerViewAdapter(problems);
 
-
         getDate();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
 
-        query.whereGreaterThanOrEqualTo("createdAt", today);
-        query.whereLessThan("createdAt", tomorrow);
+        //query.whereGreaterThanOrEqualTo("createdAt", today);
+        //query.whereLessThan("createdAt", tomorrow);
+        query.orderByDescending("createdAt");
 
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
