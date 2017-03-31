@@ -27,11 +27,13 @@ public class Log_session extends AppCompatActivity {
 
     Date today;
     Date tomorrow;
-    boolean isNewSession;
+    int isNewSession;
+    String oldSessionId;
 
     public void getIntentExtras(){
         Intent intent = getIntent();
-        isNewSession = intent.getBooleanExtra("isNew", false);
+        isNewSession = intent.getIntExtra("isNew", 0);
+        oldSessionId = intent.getStringExtra("sID");
     }
 
     public void getDate() {
@@ -73,7 +75,10 @@ public class Log_session extends AppCompatActivity {
         Log.i("isnew", String.valueOf(isNewSession));
         getDate();
 
-        if (isNewSession){
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        if (isNewSession == 1){
 
             ParseQuery<ParseObject> session = ParseQuery.getQuery("BoulderingSession");
 
@@ -134,13 +139,14 @@ public class Log_session extends AppCompatActivity {
                 }
             });
 
-        }else{
+        } if (isNewSession == 2){
+
             ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
 
             query.orderByAscending("createdAt");
-            query.whereEqualTo("parent", id[0]);
+            query.whereContains("parent", oldSessionId);
 
-            Log.i("going back id", id[0]);
+            Log.i("goingBack", oldSessionId);
 
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
@@ -152,7 +158,9 @@ public class Log_session extends AppCompatActivity {
 
                             for (ParseObject object : objects){
 
-                                problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") , object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                                problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") ,
+                                        object.getInt("problemNumber"), object.getBoolean("problemIsTraining"),
+                                        object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
                             }
 
                             recyclerView.setAdapter(adapter);
@@ -161,11 +169,8 @@ public class Log_session extends AppCompatActivity {
                     }
                 }
             });
+
         }
-
-
-
-
 
         FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addProblemFAB);
         FAB.setOnClickListener(new View.OnClickListener() {
@@ -174,6 +179,7 @@ public class Log_session extends AppCompatActivity {
 
                 Intent intent = new Intent(Log_session.this, AddProblem.class);
                 startActivity(intent);
+                isNewSession = 3;
 
             }
         });
@@ -181,7 +187,7 @@ public class Log_session extends AppCompatActivity {
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         final List<Problem> problems = new ArrayList<>();
@@ -193,45 +199,50 @@ public class Log_session extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
 
         final ProblemRecyclerViewAdapter adapter = new ProblemRecyclerViewAdapter(problems);
-        ParseQuery<ParseObject> session = ParseQuery.getQuery("BoulderingSession");
 
-        session.orderByDescending("createdAt");
-        session.getFirstInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(final ParseObject sessionObject, ParseException e) {
-                if (e == null) {
-                    if (sessionObject != null) {
 
-                        ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
+        if (isNewSession == 3) {
+            ParseQuery<ParseObject> session = ParseQuery.getQuery("BoulderingSession");
+            session.orderByDescending("createdAt");
+            session.getFirstInBackground(new GetCallback<ParseObject>() {
+                @Override
+                public void done(final ParseObject sessionObject, ParseException e) {
+                    if (e == null) {
+                        if (sessionObject != null) {
 
-                        query.orderByAscending("createdAt");
-                        query.whereEqualTo("parent", sessionObject);
+                            ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
 
-                        query.findInBackground(new FindCallback<ParseObject>() {
-                            @Override
-                            public void done(List<ParseObject> objects, ParseException e) {
+                            query.orderByAscending("createdAt");
+                            query.whereEqualTo("parent", sessionObject);
 
-                                if (e == null) {
+                            Log.i("notsessionid", sessionObject.getObjectId());
 
-                                    if (objects.size() > 0) {
+                            query.findInBackground(new FindCallback<ParseObject>() {
+                                @Override
+                                public void done(List<ParseObject> objects, ParseException e) {
 
-                                        for (ParseObject object : objects) {
+                                    if (e == null) {
 
-                                            problems.add(new Problem(object.getInt("problemGrade"), object.getInt("problemAttempts"), object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                                        if (objects.size() > 0) {
+
+                                            for (ParseObject object : objects) {
+
+                                                problems.add(new Problem(object.getInt("problemGrade"), object.getInt("problemAttempts"), object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                                            }
+
+                                            recyclerView.setAdapter(adapter);
+                                            adapter.notifyDataSetChanged();
+
+                                            Log.i("hello", "1");
                                         }
-
-                                        recyclerView.setAdapter(adapter);
-                                        adapter.notifyDataSetChanged();
-
-                                        Log.i("hello", "1");
                                     }
                                 }
-                            }
-                        });
-                    }
+                            });
+                        }
 
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }

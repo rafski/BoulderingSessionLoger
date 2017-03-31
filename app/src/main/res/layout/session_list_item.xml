@@ -51,16 +51,14 @@
             android:layout_toEndOf="@+id/avgIcon"
             android:text="V6 average" />
 
-        <Button
-            android:id="@+id/goToDetailButton"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        <TextView
+            android:id="@+id/sessionHistoryID"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="4dp"
-            android:onClick="goToViewHistory"
-            android:text="more" />
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="29dp"
+            android:visibility="invisible" />
 
 
     </RelativeLayout>

@@ -7,13 +7,14 @@ package com.example.raf.boulderingsessionloger;
 class Session {
     String numberOfSends;
     String averageSendDifficulty;
-    //date
+    String sessionID;
     //location
     //total attempts
 
-    Session(String numberOfSends, String averageSendDifficulty) {
+    Session(String numberOfSends, String averageSendDifficulty, String sessionID) {
         this.numberOfSends = numberOfSends;
         this.averageSendDifficulty = averageSendDifficulty;
+        this.sessionID = sessionID;
     }
 
 

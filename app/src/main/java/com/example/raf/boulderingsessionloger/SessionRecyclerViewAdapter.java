@@ -13,14 +13,11 @@ import java.util.List;
 
 public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionListViewHolder>{
 
-
-
     List<Session> sessions;
 
     SessionRecyclerViewAdapter(List<Session> sessions){
         this.sessions = sessions;
     }
-
 
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
@@ -35,15 +32,18 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionList
     }
 
     @Override
-    public void onBindViewHolder(SessionListViewHolder holder, int i) {
+    public void onBindViewHolder(final SessionListViewHolder holder, int i) {
         holder.sendNumber.setText(sessions.get(i).numberOfSends);
         holder.sendAverage.setText(sessions.get(i).averageSendDifficulty);
+        holder.sessionID.setText(sessions.get(i).sessionID);
     }
 
     @Override
     public int getItemCount() {
         return sessions.size();
     }
+
+
 
 }
 

@@ -6,11 +6,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -18,8 +23,7 @@ import java.util.List;
 
 public class Welcome extends AppCompatActivity {
 
-    private List<Session> sessions;
-    private RecyclerView recyclerView;
+   int isNew;
     View parentLayout;
 
     @Override
@@ -51,8 +55,7 @@ public class Welcome extends AppCompatActivity {
 
     public void goToLogSession(View view) {
 
-        boolean isNew = true;
-
+        isNew = 1;
         Intent intent = new Intent(Welcome.this, Log_session.class);
         intent.putExtra("isNew", isNew );
         startActivity(intent);
@@ -64,19 +67,15 @@ public class Welcome extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void goToViewHistory(View view) {
-
-        Intent intent = new Intent(Welcome.this, View_history.class);
-        startActivity(intent);
-
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
 
-        recyclerView = (RecyclerView) findViewById(R.id.my_recycler);
+        final List<Session> sessions = new ArrayList<>();
+
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.my_recycler);
 
         parentLayout = findViewById(R.id.coordinatorLayout);
 
@@ -84,11 +83,8 @@ public class Welcome extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
 
-        SessionRecyclerViewAdapter adapter = new SessionRecyclerViewAdapter(sessions);
+        final SessionRecyclerViewAdapter adapter = new SessionRecyclerViewAdapter(sessions);
         recyclerView.setAdapter(adapter);
-
-        initializeData();
-        initializeAdapter();
 
         ParseUser currentUser = ParseUser.getCurrentUser();
 
@@ -100,6 +96,60 @@ public class Welcome extends AppCompatActivity {
 
         }
 
+        ParseQuery<ParseObject> oldSessions = new ParseQuery<ParseObject>("BoulderingSession");
+        oldSessions.orderByDescending("createdAt");
+        oldSessions.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> sessionsParse, ParseException e) {
+                if (e == null){
+
+                    if (sessionsParse.size() > 0){
+                        Log.i("sessions ni", String.valueOf(sessionsParse.size()));
+
+                        for (final ParseObject sessionParse : sessionsParse){
+
+                            final String sID = sessionParse.getObjectId();
+
+                            ParseQuery<ParseObject> problemsInSession = new ParseQuery<ParseObject>("SavedProblem");
+
+                            problemsInSession.whereEqualTo("parent", sessionParse);
+                            problemsInSession.findInBackground(new FindCallback<ParseObject>() {
+
+                                @Override
+                                public void done(List<ParseObject> problems, ParseException e) {
+                                    if (e == null){
+                                        int totalGrade = 0;
+
+                                        if (problems.size() >0){
+
+                                            for (final ParseObject problem : problems){
+
+                                                totalGrade = totalGrade + problem.getInt("problemGrade");
+
+                                            }
+                                        }
+
+                                        int averageGrade;
+                                        if (problems.size() > 0){
+                                            averageGrade = totalGrade/problems.size();
+                                        }else{
+                                            averageGrade = 0;
+                                        }
+
+                                        sessions.add(new Session(String.valueOf(problems.size()) + " problems",
+                                                "V" + averageGrade + " average", sID));
+                                        recyclerView.setAdapter(adapter);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
+
+
         FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addSessionFAB);
         FAB.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,21 +160,85 @@ public class Welcome extends AppCompatActivity {
         });
     }
 
-    private void initializeData() {
-        sessions = new ArrayList<>();
-        sessions.add(new Session("12 sends", "V4 average"));
-        sessions.add(new Session("3 sends", "V6 average"));
-        sessions.add(new Session("21 sends", "V3 average"));
-        sessions.add(new Session("12 sends", "V4 average"));
-        sessions.add(new Session("3 sends", "V6 average"));
-        sessions.add(new Session("21 sends", "V3 average"));
-        sessions.add(new Session("12 sends", "V4 average"));
-        sessions.add(new Session("3 sends", "V6 average"));
-        sessions.add(new Session("21 sends", "V3 average"));
-    }
+    @Override
+    protected void onResume(){
+        super.onResume();
 
-    private void initializeAdapter() {
-        SessionRecyclerViewAdapter adapter = new SessionRecyclerViewAdapter(sessions);
+        final List<Session> sessions = new ArrayList<>();
+
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.my_recycler);
+
+        parentLayout = findViewById(R.id.coordinatorLayout);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setHasFixedSize(true);
+
+        final SessionRecyclerViewAdapter adapter = new SessionRecyclerViewAdapter(sessions);
         recyclerView.setAdapter(adapter);
+
+        ParseUser currentUser = ParseUser.getCurrentUser();
+
+        if (currentUser != null) {
+            // do stuff with the user
+        } else {
+            Intent intent = new Intent(Welcome.this, Login.class);
+            startActivity(intent);
+
+        }
+
+        ParseQuery<ParseObject> oldSessions = new ParseQuery<ParseObject>("BoulderingSession");
+        oldSessions.orderByDescending("createdAt");
+        oldSessions.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> sessionsParse, ParseException e) {
+                if (e == null){
+
+                    if (sessionsParse.size() > 0){
+                        Log.i("sessions ni", String.valueOf(sessionsParse.size()));
+
+                        for (final ParseObject sessionParse : sessionsParse){
+
+                            final String sID = sessionParse.getObjectId();
+
+                            ParseQuery<ParseObject> problemsInSession = new ParseQuery<ParseObject>("SavedProblem");
+
+                            problemsInSession.whereEqualTo("parent", sessionParse);
+                            problemsInSession.findInBackground(new FindCallback<ParseObject>() {
+
+                                @Override
+                                public void done(List<ParseObject> problems, ParseException e) {
+                                    if (e == null){
+                                        int totalGrade = 0;
+
+                                        if (problems.size() >0){
+
+                                            for (final ParseObject problem : problems){
+
+                                                totalGrade = totalGrade + problem.getInt("problemGrade");
+
+                                            }
+                                        }
+                                        int averageGrade;
+                                        if (problems.size() > 0){
+                                            averageGrade = totalGrade/problems.size();
+                                        }else{
+                                            averageGrade = 0;
+                                        }
+                                        sessions.add(new Session(String.valueOf(problems.size()) + " problems",
+                                                "V" + averageGrade + " average", sID));
+
+                                        Log.i("sID", sID);
+                                        recyclerView.setAdapter(adapter);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
+
     }
 }
