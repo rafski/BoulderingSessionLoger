@@ -68,25 +68,56 @@ public class Log_session extends AppCompatActivity {
 
         getIntentExtras();
 
+        final String[] id = new String[1];
+
         Log.i("isnew", String.valueOf(isNewSession));
         getDate();
 
         if (isNewSession){
 
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("BoulderingSession");
+            ParseQuery<ParseObject> session = ParseQuery.getQuery("BoulderingSession");
 
-            query.orderByDescending("sessionID");
-            query.getFirstInBackground(new GetCallback<ParseObject>() {
+            session.orderByDescending("createdAt");
+            session.getFirstInBackground(new GetCallback<ParseObject>() {
                 @Override
-                public void done(ParseObject object, ParseException e) {
+                public void done(final ParseObject sessionObject, ParseException e) {
                     if (e == null) {
-                        if (object != null){
+                        if (sessionObject != null){
 
-                            ParseObject BoulderingSession = new ParseObject("BoulderingSession");
+                            final ParseObject BoulderingSession = new ParseObject("BoulderingSession");
                             BoulderingSession.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException ex) {
                                     if (ex == null) {
+
+                                        id[0] = BoulderingSession.getObjectId();
+
+                                        Log.i("created session id", id[0]);
+
+                                        ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
+
+                                        query.orderByAscending("createdAt");
+                                        query.whereEqualTo("parent", id[0]);
+
+                                        query.findInBackground(new FindCallback<ParseObject>() {
+                                            @Override
+                                            public void done(List<ParseObject> objects, ParseException e) {
+
+                                                if (e == null){
+
+                                                    if (objects.size() > 0){
+
+                                                        for (ParseObject object : objects){
+
+                                                            problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") , object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                                                        }
+
+                                                        recyclerView.setAdapter(adapter);
+                                                        adapter.notifyDataSetChanged();
+                                                    }
+                                                }
+                                            }
+                                        });
                                         Toast.makeText(getApplication().getBaseContext(), "Session created", Toast.LENGTH_LONG).show();
                                     } else {
                                         Toast.makeText(getApplication().getBaseContext(), "Oops", Toast.LENGTH_LONG).show();
@@ -94,39 +125,47 @@ public class Log_session extends AppCompatActivity {
                                 }
                             });
 
-                            Toast.makeText(getApplication().getBaseContext(), "Session created", Toast.LENGTH_LONG).show();
                         }
 
                     } else {
                         Toast.makeText(getApplication().getBaseContext(), "Oops", Toast.LENGTH_LONG).show();
                     }
+
                 }
             });
 
-        }
+        }else{
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
 
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
+            query.orderByAscending("createdAt");
+            query.whereEqualTo("parent", id[0]);
 
-        query.orderByDescending("createdAt");
+            Log.i("going back id", id[0]);
 
-        query.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> objects, ParseException e) {
+            query.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> objects, ParseException e) {
 
-                if (e == null){
+                    if (e == null){
 
-                    if (objects.size() > 0){
+                        if (objects.size() > 0){
 
-                        for (ParseObject object : objects){
+                            for (ParseObject object : objects){
 
-                            problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") , object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                                problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") , object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                            }
+
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
                         }
-
-                        recyclerView.setAdapter(adapter);
                     }
                 }
-            }
-        });
+            });
+        }
+
+
+
+
 
         FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addProblemFAB);
         FAB.setOnClickListener(new View.OnClickListener() {
@@ -141,4 +180,58 @@ public class Log_session extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        final List<Problem> problems = new ArrayList<>();
+
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.problemRecyclerView);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setHasFixedSize(true);
+
+        final ProblemRecyclerViewAdapter adapter = new ProblemRecyclerViewAdapter(problems);
+        ParseQuery<ParseObject> session = ParseQuery.getQuery("BoulderingSession");
+
+        session.orderByDescending("createdAt");
+        session.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(final ParseObject sessionObject, ParseException e) {
+                if (e == null) {
+                    if (sessionObject != null) {
+
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
+
+                        query.orderByAscending("createdAt");
+                        query.whereEqualTo("parent", sessionObject);
+
+                        query.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> objects, ParseException e) {
+
+                                if (e == null) {
+
+                                    if (objects.size() > 0) {
+
+                                        for (ParseObject object : objects) {
+
+                                            problems.add(new Problem(object.getInt("problemGrade"), object.getInt("problemAttempts"), object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                                        }
+
+                                        recyclerView.setAdapter(adapter);
+                                        adapter.notifyDataSetChanged();
+
+                                        Log.i("hello", "1");
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                }
+            }
+        });
+    }
 }
