@@ -23,7 +23,7 @@ import java.util.List;
 
 public class Welcome extends AppCompatActivity {
 
-   int isNew;
+    int isNew;
     View parentLayout;
 
     @Override
@@ -82,6 +82,8 @@ public class Welcome extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
+
+
 
         final SessionRecyclerViewAdapter adapter = new SessionRecyclerViewAdapter(sessions);
         recyclerView.setAdapter(adapter);
@@ -150,12 +152,35 @@ public class Welcome extends AppCompatActivity {
         });
 
 
-        FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addSessionFAB);
+        final FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addSessionFAB);
         FAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 goToLogSession(view);
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                if (dy > 0 ||dy<0 && FAB.isShown())
+                {
+                    FAB.hide();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    FAB.show();
+                }
+
+                super.onScrollStateChanged(recyclerView, newState);
             }
         });
     }

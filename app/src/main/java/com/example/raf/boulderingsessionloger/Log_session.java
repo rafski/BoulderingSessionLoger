@@ -172,7 +172,7 @@ public class Log_session extends AppCompatActivity {
 
         }
 
-        FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addProblemFAB);
+        final FloatingActionButton FAB = (FloatingActionButton) findViewById(R.id.addProblemFAB);
         FAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -181,6 +181,29 @@ public class Log_session extends AppCompatActivity {
                 startActivity(intent);
                 isNewSession = 3;
 
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                if (dy > 0 ||dy<0 && FAB.isShown())
+                {
+                    FAB.hide();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    FAB.show();
+                }
+
+                super.onScrollStateChanged(recyclerView, newState);
             }
         });
 
