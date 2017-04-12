@@ -80,64 +80,47 @@ public class Log_session extends AppCompatActivity {
 
         if (isNewSession == 1){
 
-            ParseQuery<ParseObject> session = ParseQuery.getQuery("BoulderingSession");
 
-            session.orderByDescending("createdAt");
-            session.getFirstInBackground(new GetCallback<ParseObject>() {
+            final ParseObject BoulderingSession = new ParseObject("BoulderingSession");
+            BoulderingSession.saveInBackground(new SaveCallback() {
                 @Override
-                public void done(final ParseObject sessionObject, ParseException e) {
-                    if (e == null) {
-                        if (sessionObject != null){
+                public void done(ParseException ex) {
+                    if (ex == null) {
 
-                            final ParseObject BoulderingSession = new ParseObject("BoulderingSession");
-                            BoulderingSession.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException ex) {
-                                    if (ex == null) {
+                        id[0] = BoulderingSession.getObjectId();
 
-                                        id[0] = BoulderingSession.getObjectId();
+                        Log.i("created session id", id[0]);
 
-                                        Log.i("created session id", id[0]);
+                        ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
 
-                                        ParseQuery<ParseObject> query = ParseQuery.getQuery("SavedProblem");
+                        query.orderByAscending("createdAt");
+                        query.whereEqualTo("parent", id[0]);
 
-                                        query.orderByAscending("createdAt");
-                                        query.whereEqualTo("parent", id[0]);
+                        query.findInBackground(new FindCallback<ParseObject>() {
+                            @Override
+                            public void done(List<ParseObject> objects, ParseException e) {
+                                if (e == null){
 
-                                        query.findInBackground(new FindCallback<ParseObject>() {
-                                            @Override
-                                            public void done(List<ParseObject> objects, ParseException e) {
+                                    if (objects.size() > 0){
 
-                                                if (e == null){
+                                        for (ParseObject object : objects){
 
-                                                    if (objects.size() > 0){
+                                            problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") , object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
+                                        }
 
-                                                        for (ParseObject object : objects){
-
-                                                            problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") , object.getInt("problemNumber"), object.getBoolean("problemIsTraining"), object.getBoolean("problemIsTraining"), String.valueOf(object.getString("circuitName"))));
-                                                        }
-
-                                                        recyclerView.setAdapter(adapter);
-                                                        adapter.notifyDataSetChanged();
-                                                    }
-                                                }
-                                            }
-                                        });
-                                        Toast.makeText(getApplication().getBaseContext(), "Session created", Toast.LENGTH_LONG).show();
-                                    } else {
-                                        Toast.makeText(getApplication().getBaseContext(), "Oops", Toast.LENGTH_LONG).show();
+                                        recyclerView.setAdapter(adapter);
+                                        adapter.notifyDataSetChanged();
                                     }
                                 }
-                            });
-
-                        }
-
+                            }
+                        });
+                        Toast.makeText(getApplication().getBaseContext(), "Session created", Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(getApplication().getBaseContext(), "Oops", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplication().getBaseContext(), "No session created", Toast.LENGTH_LONG).show();
                     }
-
                 }
             });
+
 
         } if (isNewSession == 2){
 
@@ -148,6 +131,8 @@ public class Log_session extends AppCompatActivity {
 
             Log.i("goingBack", oldSessionId);
 
+            final String[] problemId = new String[1];
+
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> objects, ParseException e) {
@@ -157,6 +142,8 @@ public class Log_session extends AppCompatActivity {
                         if (objects.size() > 0){
 
                             for (ParseObject object : objects){
+
+                                problemId[0] = object.getObjectId();
 
                                 problems.add(new Problem(object.getInt("problemGrade") ,object.getInt("problemAttempts") ,
                                         object.getInt("problemNumber"), object.getBoolean("problemIsTraining"),

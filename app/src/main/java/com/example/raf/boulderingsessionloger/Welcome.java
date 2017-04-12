@@ -1,12 +1,14 @@
 package com.example.raf.boulderingsessionloger;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -46,6 +48,10 @@ public class Welcome extends AppCompatActivity {
                 ParseUser currentUser = ParseUser.getCurrentUser();
                 goToLogIn();
                 return true;
+            case R.id.graphsmenubutton:
+                Intent intent = new Intent(Welcome.this, Graphs.class);
+                startActivity(intent);
+                return true;
             default:
                 return false;
 
@@ -67,11 +73,19 @@ public class Welcome extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome);
+
+        isNetworkAvailable();
 
         final List<Session> sessions = new ArrayList<>();
 
@@ -82,8 +96,6 @@ public class Welcome extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
-
-
 
         final SessionRecyclerViewAdapter adapter = new SessionRecyclerViewAdapter(sessions);
         recyclerView.setAdapter(adapter);
@@ -99,6 +111,9 @@ public class Welcome extends AppCompatActivity {
         }
 
         ParseQuery<ParseObject> oldSessions = new ParseQuery<ParseObject>("BoulderingSession");
+        if (isNetworkAvailable() == false){
+            oldSessions.fromLocalDatastore();
+        }
         oldSessions.orderByDescending("createdAt");
         oldSessions.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -106,14 +121,19 @@ public class Welcome extends AppCompatActivity {
                 if (e == null){
 
                     if (sessionsParse.size() > 0){
-                        Log.i("sessions ni", String.valueOf(sessionsParse.size()));
 
                         for (final ParseObject sessionParse : sessionsParse){
 
+                            String createdAt = sessionParse.getCreatedAt().toString();
+                            String input = createdAt;
+                            String output = input.substring(0, 10) +" "+ input.substring(30, 34);
+                            final String sessionDate = output;
                             final String sID = sessionParse.getObjectId();
 
                             ParseQuery<ParseObject> problemsInSession = new ParseQuery<ParseObject>("SavedProblem");
-
+                            if (isNetworkAvailable() == false){
+                                problemsInSession.fromLocalDatastore();
+                            }
                             problemsInSession.whereEqualTo("parent", sessionParse);
                             problemsInSession.findInBackground(new FindCallback<ParseObject>() {
 
@@ -139,7 +159,7 @@ public class Welcome extends AppCompatActivity {
                                         }
 
                                         sessions.add(new Session(String.valueOf(problems.size()) + " problems",
-                                                "V" + averageGrade + " average", sID));
+                                                "V" + averageGrade + " average", sessionDate, sID));
                                         recyclerView.setAdapter(adapter);
                                         adapter.notifyDataSetChanged();
                                     }
@@ -220,9 +240,13 @@ public class Welcome extends AppCompatActivity {
                 if (e == null){
 
                     if (sessionsParse.size() > 0){
-                        Log.i("sessions ni", String.valueOf(sessionsParse.size()));
 
                         for (final ParseObject sessionParse : sessionsParse){
+
+                            String createdAt = sessionParse.getCreatedAt().toString();
+                            String input = createdAt;
+                            String output = input.substring(0, 10) +" "+ input.substring(30, 34);
+                            final String sessionDate = output;
 
                             final String sID = sessionParse.getObjectId();
 
@@ -251,9 +275,9 @@ public class Welcome extends AppCompatActivity {
                                             averageGrade = 0;
                                         }
                                         sessions.add(new Session(String.valueOf(problems.size()) + " problems",
-                                                "V" + averageGrade + " average", sID));
+                                                "V" + averageGrade + " average", sessionDate, sID));
 
-                                        Log.i("sID", sID);
+
                                         recyclerView.setAdapter(adapter);
                                         adapter.notifyDataSetChanged();
                                     }

@@ -132,7 +132,6 @@ public class Login extends AppCompatActivity implements View.OnKeyListener, View
         password.setOnKeyListener(this);
 
 
-
         ParseAnalytics.trackAppOpenedInBackground(getIntent());
 
     }

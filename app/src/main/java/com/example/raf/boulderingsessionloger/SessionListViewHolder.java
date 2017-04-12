@@ -20,6 +20,7 @@ public class SessionListViewHolder extends RecyclerView.ViewHolder implements Vi
     TextView sendNumber;
     TextView sendAverage;
     TextView sessionID;
+    TextView sessionDate;
 
     final Context context;
 
@@ -30,7 +31,9 @@ public class SessionListViewHolder extends RecyclerView.ViewHolder implements Vi
         sessionCard = (CardView)itemView.findViewById(R.id.sessionCard);
         sendNumber = (TextView)itemView.findViewById(R.id.numberOfSendsTextView);
         sendAverage = (TextView)itemView.findViewById(R.id.sendAverageTextView);
+        sessionDate = (TextView)itemView.findViewById(R.id.dateText);
         sessionID = (TextView)itemView.findViewById(R.id.sessionHistoryID);
+
     }
 
     @Override

@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">Bouldering Session Loger</string>
+    <string name="average_grade">Average grade</string>
+    <string name="total_number_of_attempts">Total number of attempts</string>
+    <string name="circuit_name">Circuit Name</string>
+    <string name="climb">Climb</string>
+    <string name="done">Done</string>
+    <string name="number_of_attempts">Number of attempts</string>
+    <string name="problem_grade">Problem Grade</string>
+    <string name="problem_number">Problem Number</string>
+    <string name="project">Project</string>
+    <string name="training">Training</string>
+    <string name="roboto_light" />
+    <string name="number_picker_formatter">V% 2d </string>
+    <string name="attemps_picker_formatter">%2d tries</string>
+    <string name="_12_sends">12 sends</string>
+    <string name="v6_average">V6 average</string>
+    <string name="textview">Date</string>
 </resources>

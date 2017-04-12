@@ -35,6 +35,7 @@ public class SessionRecyclerViewAdapter extends RecyclerView.Adapter<SessionList
     public void onBindViewHolder(final SessionListViewHolder holder, int i) {
         holder.sendNumber.setText(sessions.get(i).numberOfSends);
         holder.sendAverage.setText(sessions.get(i).averageSendDifficulty);
+        holder.sessionDate.setText(sessions.get(i).sessionDate);
         holder.sessionID.setText(sessions.get(i).sessionID);
     }
 

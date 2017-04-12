@@ -3,5 +3,7 @@
 
     <item android:title="Log out"
         android:id="@+id/logoutmenubutton"></item>
+    <item android:title="Graphs"
+        android:id="@+id/graphsmenubutton"></item>
 
 </menu>
